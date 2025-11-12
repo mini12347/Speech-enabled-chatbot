@@ -8,9 +8,9 @@ import string
 import random
 import json
 try:
-    nltk.data.find('tokenizers/punkt')
+    nltk.data.find('tokenizers/punkt_tab')
 except LookupError:
-    nltk.download('punkt')
+    nltk.download('punkt_tab')
 
 try:
     nltk.data.find('corpora/stopwords')
@@ -119,5 +119,6 @@ def app():
 if __name__=="__main__":
 
     app()
+
 
 
