@@ -113,12 +113,13 @@ def app():
         user_text = st.text_input("Or type your message:")
         if user_text:
             st.session_state.messages.append({"role": "user", "content": user_text})
-            user_text.text=''
+            user_text = ''
             response = chatbot(user_text)
             st.session_state.messages.append({"role": "assistant", "content": response})
 if __name__=="__main__":
 
     app()
+
 
 
 
