@@ -9,6 +9,13 @@ import random
 import json
 
 try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
     nltk.download('punkt')
@@ -118,4 +125,5 @@ def app():
             response = chatbot(user_text)
             st.session_state.messages.append({"role": "assistant", "content": response})
 if __name__=="__main__":
+
     app()
