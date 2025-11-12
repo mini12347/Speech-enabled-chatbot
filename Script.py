@@ -7,7 +7,7 @@ import speech_recognition as sr
 import string
 import random
 import json
-
+import ssl
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
@@ -127,3 +127,4 @@ def app():
 if __name__=="__main__":
 
     app()
+
