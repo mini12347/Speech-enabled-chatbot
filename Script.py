@@ -7,21 +7,12 @@ import speech_recognition as sr
 import string
 import random
 import json
-try:
-    nltk.data.find('tokenizers/punkt_tab')
-except LookupError:
-    nltk.download('punkt_tab')
 
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
-try:
-    nltk.data.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet')
-with open('./data.json','rb') as f:
+with open('./data.json', 'r') as f:
     intents_json = json.load(f)
 
 def preprocess(sentence):
@@ -88,7 +79,8 @@ def transcribe_audio():
 def chatbot(question):
     intent, response = find_best_match(question)
     return response if response else "I'm here to support you. Could you tell me more about how you're feeling?"
-def app(): 
+
+def main(): 
     st.set_page_config(page_title="Speech Chatbot", layout="centered")
     st.title("Speech-Enabled Chatbot")
 
@@ -99,27 +91,20 @@ def app():
         with st.chat_message(message["role"]):
             st.write(message["content"])
 
-    col1, col2 = st.columns(2)
-
-    with col1:
-        if st.button("🎤 Record Audio"):
-            user_input = transcribe_audio()
-            if user_input:
-                st.session_state.messages.append({"role": "user", "content": user_input})
-                response = chatbot(user_input)
-                st.session_state.messages.append({"role": "assistant", "content": response})
-
-    with col2:
-        user_text = st.text_input("Or type your message:")
-        if user_text:
-            st.session_state.messages.append({"role": "user", "content": user_text})
-            user_text = ''
-            response = chatbot(user_text)
+    if st.button("🎤 Record Audio"):
+        user_input = transcribe_audio()
+        if user_input and user_input not in ["Could not understand audio", "Error with speech recognition service"]:
+            st.session_state.messages.append({"role": "user", "content": user_input})
+            response = chatbot(user_input)
             st.session_state.messages.append({"role": "assistant", "content": response})
-if __name__=="__main__":
+            st.rerun()
 
-    app()
+    user_text = st.text_input("Or type your message:")
+    if user_text:
+        st.session_state.messages.append({"role": "user", "content": user_text})
+        response = chatbot(user_text)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.rerun()
 
-
-
-
+if __name__ == "__main__":
+    main()
