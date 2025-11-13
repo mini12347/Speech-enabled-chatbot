@@ -1,4 +1,4 @@
 streamlit==1.47.1
 nltk==3.8.1
 speechrecognition==3.10.0
-python-dotenv==1.0.1
+
