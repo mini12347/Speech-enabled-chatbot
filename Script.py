@@ -64,15 +64,7 @@ def find_best_match(user_input):
 def transcribe_audio():
     recognizer = sr.Recognizer()
     try:
-        with sr.Microphone() as source:
-            st.info("Listening...")
-            audio = recognizer.listen(source, timeout=10)
-        transcript = recognizer.recognize_google(audio)
-        return transcript
-    except sr.UnknownValueError:
-        return "Could not understand audio"
-    except sr.RequestError:
-        return "Error with speech recognition service"
+        return "Speech recording is not available in this environment. Please use text input instead."
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -86,25 +78,33 @@ def main():
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    if "last_input" not in st.session_state:
+        st.session_state.last_input = ""
 
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.write(message["content"])
 
-    if st.button("🎤 Record Audio"):
-        user_input = transcribe_audio()
-        if user_input and user_input not in ["Could not understand audio", "Error with speech recognition service"]:
-            st.session_state.messages.append({"role": "user", "content": user_input})
-            response = chatbot(user_input)
-            st.session_state.messages.append({"role": "assistant", "content": response})
-            st.rerun()
+    col1, col2 = st.columns([1, 2])
 
-    user_text = st.text_input("Or type your message:")
-    if user_text:
-        st.session_state.messages.append({"role": "user", "content": user_text})
-        response = chatbot(user_text)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        st.rerun()
+    with col1:
+        if st.button("🎤 Record Audio"):
+            user_input = transcribe_audio()
+            if user_input and user_input != st.session_state.last_input:
+                st.session_state.messages.append({"role": "user", "content": "Voice: " + user_input})
+                response = chatbot(user_input)
+                st.session_state.messages.append({"role": "assistant", "content": response})
+                st.session_state.last_input = user_input
+                st.rerun()
+
+    with col2:
+        user_text = st.text_input("Type your message:", key="text_input")
+        if st.button("Send Message") and user_text and user_text != st.session_state.last_input:
+            st.session_state.messages.append({"role": "user", "content": user_text})
+            response = chatbot(user_text)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+            st.session_state.last_input = user_text
+            st.rerun()
 
 if __name__ == "__main__":
     main()
